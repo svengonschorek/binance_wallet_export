@@ -3,20 +3,32 @@ Transform: AWS::Serverless-2016-10-31
 
 Globals:
   Function:
-    Timeout: 15
-    MemorySize: 128
+    Timeout: 30
+    MemorySize: 256
 
 Resources:
+  BinanceLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: binance-dependencies
+      Description: Layer containing python-binance dependency
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - python3.11
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.11
+
   BinanceExportFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: binance_export/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.11
       Role: arn:aws:iam::274076144467:role/daily-binance-export-role
       Layers:
-        - arn:aws:lambda:eu-central-1:274076144467:layer:python-binance:2
-        - arn:aws:lambda:eu-central-1:336392948345:layer:AWSSDKPandas-Python39:3
+        - !Ref BinanceLayer
+        - arn:aws:lambda:eu-central-1:336392948345:layer:AWSSDKPandas-Python311:3
       Events:
         InvocationLevel:
           Type: Schedule

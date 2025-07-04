@@ -78,6 +78,7 @@ def lambda_handler(event, context):
         
         # Storing data on Data Lake
         try:
+            print(data)
             wr.s3.to_parquet(
                 df=data,
                 path="s3://raw-binance-data/daily-wallet-export/",
